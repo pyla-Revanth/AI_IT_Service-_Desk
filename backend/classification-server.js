@@ -8,7 +8,7 @@ require('dotenv').config();
 const classificationRoutes = require('./routes/classification');
 
 const app = express();
-const PORT = process.env.PORT || 3002;
+const PORT = process.env.CLASSIFICATION_PORT || 3002;
 
 // Security middleware
 app.use(helmet({

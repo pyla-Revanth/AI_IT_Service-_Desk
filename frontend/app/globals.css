@@ -26,6 +26,41 @@ body {
     rgb(var(--background-start-rgb));
 }
 
+/* Fix placeholder text colors */
+::placeholder {
+  color: #111827 !important;
+  opacity: 1 !important;
+}
+
+/* For webkit browsers */
+::-webkit-input-placeholder {
+  color: #111827 !important;
+  opacity: 1 !important;
+}
+
+/* For mozilla browsers */
+::-moz-placeholder {
+  color: #111827 !important;
+  opacity: 1 !important;
+}
+
+/* For microsoft browsers */
+:-ms-input-placeholder {
+  color: #111827 !important;
+  opacity: 1 !important;
+}
+
+/* Fix input text colors */
+input, textarea, select {
+  color: #111827 !important;
+}
+
+/* Fix select option colors */
+select option {
+  color: #111827 !important;
+  background-color: white !important;
+}
+
 @layer components {
   .btn {
     @apply px-4 py-2 rounded-md font-medium transition-colors duration-200;
