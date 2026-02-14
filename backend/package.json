@@ -7,7 +7,9 @@
     "dev": "nodemon app.js",
     "start": "node app.js",
     "build": "echo 'No build step required for Node.js'",
-    "test": "node test-api.js"
+    "test": "node test-api.js",
+    "classification": "node classification-server.js",
+    "test-classification": "node test-classification.js"
   },
   "dependencies": {
     "express": "^4.18.2",
