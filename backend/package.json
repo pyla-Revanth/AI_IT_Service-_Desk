@@ -9,7 +9,9 @@
     "build": "echo 'No build step required for Node.js'",
     "test": "node test-api.js",
     "classification": "node classification-server.js",
-    "test-classification": "node test-classification.js"
+    "test-classification": "node test-classification.js",
+    "automation": "node automation-server.js",
+    "test-automation": "node test-automation.js"
   },
   "dependencies": {
     "express": "^4.18.2",

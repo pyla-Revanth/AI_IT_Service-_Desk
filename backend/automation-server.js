@@ -5,14 +5,10 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 // Import routes
-const simpleRoutes = require('./routes/simple');
-const classificationRoutes = require('./routes/classification');
 const automationRoutes = require('./routes/automation');
-const adminRoutes = require('./routes/admin');
-const ticketRoutes = require('./ticket-api');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.AUTOMATION_PORT || 3003;
 
 // Security middleware
 app.use(helmet({
@@ -37,10 +33,10 @@ app.use(cors({
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
+  max: 50, // limit each IP to 50 requests per windowMs (lower for automation)
   message: {
     success: false,
-    error: 'Too many requests from this IP, please try again later.'
+    error: 'Too many automation requests from this IP, please try again later.'
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -61,15 +57,17 @@ app.use((req, res, next) => {
 // Health check endpoint
 app.get('/api/health', async (req, res) => {
   try {
-    const db = require('./supabase-db');
-    const dbStatus = await db.testConnection();
+    const automationExecutor = require('./automation-executor');
+    const pythonCheck = await automationExecutor.checkPythonAvailability();
     
     res.json({ 
       status: 'healthy', 
       timestamp: new Date().toISOString(),
       version: '1.0.0',
+      service: 'Automation Execution Service',
       environment: process.env.NODE_ENV || 'development',
-      database: dbStatus
+      python_available: pythonCheck.available,
+      python_version: pythonCheck.version
     });
   } catch (error) {
     res.status(500).json({
@@ -81,11 +79,7 @@ app.get('/api/health', async (req, res) => {
 });
 
 // API routes
-app.use('/api', simpleRoutes);
-app.use('/api', classificationRoutes);
 app.use('/api', automationRoutes);
-app.use('/api', adminRoutes);
-app.use('/api', ticketRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -131,18 +125,17 @@ process.on('SIGINT', () => {
 });
 
 const server = app.listen(PORT, () => {
-  console.log(`🚀 AI IT Service Desk API Server running on port ${PORT}`);
+  console.log(`🤖 Automation Execution Service running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`\n📋 Available Endpoints:`);
-  console.log(`   POST   /api/tickets - Create ticket`);
-  console.log(`   GET    /api/tickets - List tickets`);
-  console.log(`   POST   /api/tickets/classify - AI classify ticket`);
-  console.log(`   POST   /api/tickets/resolve - Resolve ticket`);
-  console.log(`   GET    /api/tickets/:id - Get specific ticket`);
-  console.log(`   PUT    /api/tickets/:id - Update ticket`);
-  console.log(`   DELETE /api/tickets/:id - Delete ticket`);
-  console.log(`   GET    /api/tickets/stats - Get statistics`);
+  console.log(`   POST   /api/automation/execute - Execute automation for ticket`);
+  console.log(`   GET    /api/automation/logs/:ticket_id - Get automation logs`);
+  console.log(`   GET    /api/automation/stats - Get automation statistics`);
+  console.log(`   GET    /api/automation/scripts - Get available scripts`);
+  console.log(`   POST   /api/automation/test - Test automation system`);
+  console.log(`   GET    /api/automation/python/check - Check Python availability`);
+  console.log(`   POST   /api/automation/manual - Manual script execution`);
   console.log(`   GET    /api/health - Health check`);
 });
 
