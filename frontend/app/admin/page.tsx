@@ -12,7 +12,12 @@ import {
   Calendar,
   Filter,
   RefreshCw,
-  Trash2
+  Trash2,
+  Shield,
+  Cpu,
+  Wifi,
+  HardDrive,
+  Sparkles
 } from 'lucide-react'
 import Link from 'next/link'
 
@@ -29,17 +34,18 @@ interface DashboardStats {
 
 interface Ticket {
   id: string
-  title: string
+  title?: string
+  issue: string
   category: string
   priority: string
   status: string
-  created_at: string
-  resolved_at?: string
   resolution_time?: number
   user_email: string
+  created_at?: string
+  submittedAt?: string
 }
 
-export default function AdminDashboard() {
+export default function AdvancedAdminDashboard() {
   const [stats, setStats] = useState<DashboardStats | null>(null)
   const [tickets, setTickets] = useState<Ticket[]>([])
   const [loading, setLoading] = useState(true)
@@ -101,7 +107,7 @@ export default function AdminDashboard() {
       const successRate = totalTickets > 0 ? (autoResolvedTickets / totalTickets) * 100 : 0
       
       // Calculate category distribution
-      const categoryStats = {}
+      const categoryStats: Record<string, number> = {}
       localTickets.forEach(ticket => {
         categoryStats[ticket.category] = (categoryStats[ticket.category] || 0) + 1
       })
@@ -171,9 +177,9 @@ export default function AdminDashboard() {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'resolved': return '#10b981'
-      case 'in_progress': return '#3b82f6'
-      case 'escalated': return '#f59e0b'
+      case 'resolved': return '#22c55e'
+      case 'escalated': return '#ef4444'
+      case 'in_progress': return '#f59e0b'
       case 'open': return '#6b7280'
       default: return '#6b7280'
     }
@@ -191,240 +197,296 @@ export default function AdminDashboard() {
     return new Date(dateString).toLocaleDateString()
   }
 
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'hardware': return <HardDrive className="w-5 h-5" />
+      case 'network': return <Wifi className="w-5 h-5" />
+      case 'software': return <Cpu className="w-5 h-5" />
+      case 'account': return <Shield className="w-5 h-5" />
+      default: return <Zap className="w-5 h-5" />
+    }
+  }
+
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen relative overflow-hidden">
+        <div className="fixed inset-0 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 opacity-90"></div>
+        <div className="fixed inset-0">
+          <div className="absolute top-0 left-0 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+          <div className="absolute top-0 right-0 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+          <div className="absolute bottom-0 left-1/2 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+        </div>
+        <div className="relative z-10 flex items-center justify-center min-h-screen">
+          <div className="text-center">
+            <div className="w-20 h-20 border-4 border-white/20 border-t-white rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-white text-xl">Loading Advanced Analytics...</p>
+          </div>
+        </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Users className="w-5 h-5 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-semibold text-gray-900">Admin Dashboard</h1>
-                <div className="flex items-center space-x-2">
-                  <p className="text-sm text-gray-600">IT Service Desk Analytics</p>
-                  <div className={`flex items-center space-x-1 px-2 py-1 rounded-full text-xs ${
-                    connectionStatus === 'connected' ? 'bg-green-100 text-green-800' :
-                    connectionStatus === 'loading' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-red-100 text-red-800'
-                  }`}>
-                    <div className={`w-2 h-2 rounded-full ${
-                      connectionStatus === 'connected' ? 'bg-green-600' :
-                      connectionStatus === 'loading' ? 'bg-yellow-600 animate-pulse' :
-                      'bg-red-600'
-                    }`}></div>
-                    <span>{connectionStatus === 'connected' ? 'Connected' : connectionStatus === 'loading' ? 'Loading' : 'Disconnected'}</span>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex items-center space-x-4">
-              {/* Date Range Filter */}
-              <select
-                value={dateRange}
-                onChange={(e) => setDateRange(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 text-gray-900"
-              >
-                <option value="7d">Last 7 days</option>
-                <option value="30d">Last 30 days</option>
-                <option value="90d">Last 90 days</option>
-              </select>
-
-              {/* Category Filter */}
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-blue-500 text-gray-900"
-              >
-                <option value="all">All Categories</option>
-                <option value="software">Software</option>
-                <option value="hardware">Hardware</option>
-                <option value="network">Network</option>
-                <option value="account">Account</option>
-              </select>
-
-              {/* Refresh Button */}
-              <button
-                onClick={handleRefresh}
-                className="px-3 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors flex items-center space-x-1"
-                disabled={loading}
-              >
-                <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
-                <span>Refresh</span>
-              </button>
-
-              <Link 
-                href="/"
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Back to Support
-              </Link>
-            </div>
-          </div>
-        </div>
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 opacity-90"></div>
+      <div className="fixed inset-0">
+        <div className="absolute top-0 left-0 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div className="absolute top-0 right-0 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-0 left-1/2 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-        {/* KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <div className="flex items-center">
-              <div className="p-3 bg-blue-100 rounded-lg">
-                <Users className="w-6 h-6 text-blue-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Total Tickets</p>
-                <p className="text-2xl font-bold text-gray-900">{stats?.totalTickets || 0}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <div className="flex items-center">
-              <div className="p-3 bg-green-100 rounded-lg">
-                <Zap className="w-6 h-6 text-green-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Auto-Resolved</p>
-                <p className="text-2xl font-bold text-gray-900">{stats?.autoResolvedTickets || 0}</p>
-                <p className="text-xs text-green-600">
-                  {stats?.totalTickets ? 
-                    `${((stats.autoResolvedTickets / stats.totalTickets) * 100).toFixed(1)}% of total`
-                    : '0%'
-                  }
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <div className="flex items-center">
-              <div className="p-3 bg-orange-100 rounded-lg">
-                <AlertTriangle className="w-6 h-6 text-orange-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Escalated</p>
-                <p className="text-2xl font-bold text-gray-900">{stats?.escalatedTickets || 0}</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <div className="flex items-center">
-              <div className="p-3 bg-purple-100 rounded-lg">
-                <Clock className="w-6 h-6 text-purple-600" />
-              </div>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-gray-600">Avg Resolution Time</p>
-                <p className="text-2xl font-bold text-gray-900">
-                  {stats?.avgResolutionTime ? formatTime(stats.avgResolutionTime) : '0m'}
-                </p>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-          {/* Tickets by Category - Simple Bar Chart */}
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Tickets by Category</h3>
-            <div className="space-y-3">
-              {stats?.ticketsByCategory?.map((category: any, index: number) => (
-                <div key={index} className="flex items-center justify-between">
-                  <span className="text-sm font-medium text-gray-600 capitalize">{category.name}</span>
-                  <div className="flex items-center space-x-2">
-                    <div className="w-32 bg-gray-200 rounded-full h-4 relative">
-                      <div 
-                        className="bg-blue-500 h-4 rounded-full transition-all duration-500"
-                        style={{ width: `${(category.value / Math.max(...stats.ticketsByCategory.map((c: any) => c.value))) * 100}%` }}
-                      ></div>
+      <div className="relative z-10">
+        {/* Header */}
+        <header className="glass-dark border-b border-white/10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-20">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center floating">
+                  <Users className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-white">Advanced Admin Dashboard</h1>
+                  <div className="flex items-center space-x-3">
+                    <p className="text-white/80 text-sm">IT Service Desk Analytics</p>
+                    <div className={`flex items-center space-x-2 px-3 py-1 rounded-full text-xs font-medium ${
+                      connectionStatus === 'connected' ? 'bg-green-500/20 text-green-300 border border-green-500/30' :
+                      connectionStatus === 'loading' ? 'bg-yellow-500/20 text-yellow-300 border border-yellow-500/30' :
+                      'bg-red-500/20 text-red-300 border border-red-500/30'
+                    }`}>
+                      <div className={`w-2 h-2 rounded-full ${
+                        connectionStatus === 'connected' ? 'bg-green-400' :
+                        connectionStatus === 'loading' ? 'bg-yellow-400 animate-pulse' :
+                        'bg-red-400'
+                      }`}></div>
+                      <span>{connectionStatus === 'connected' ? 'Connected' : connectionStatus === 'loading' ? 'Loading' : 'Disconnected'}</span>
                     </div>
-                    <span className="text-sm font-bold text-gray-900">{category.value}</span>
                   </div>
                 </div>
-              ))}
+              </div>
+              
+              <div className="flex items-center space-x-4">
+                {/* Date Range Filter */}
+                <select
+                  value={dateRange}
+                  onChange={(e) => setDateRange(e.target.value)}
+                  className="glass px-4 py-2 rounded-xl text-white border border-white/20 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300"
+                >
+                  <option value="7d" className="bg-gray-800">Last 7 days</option>
+                  <option value="30d" className="bg-gray-800">Last 30 days</option>
+                  <option value="90d" className="bg-gray-800">Last 90 days</option>
+                </select>
+
+                {/* Category Filter */}
+                <select
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="glass px-4 py-2 rounded-xl text-white border border-white/20 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300"
+                >
+                  <option value="all" className="bg-gray-800">All Categories</option>
+                  <option value="software" className="bg-gray-800">Software</option>
+                  <option value="hardware" className="bg-gray-800">Hardware</option>
+                  <option value="network" className="bg-gray-800">Network</option>
+                  <option value="account" className="bg-gray-800">Account</option>
+                </select>
+
+                {/* Refresh Button */}
+                <button
+                  onClick={handleRefresh}
+                  className="glass px-4 py-2 rounded-xl text-white hover:scale-105 transition-all duration-300 hover:shadow-xl flex items-center space-x-2"
+                  disabled={loading}
+                >
+                  <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
+                  <span>Refresh</span>
+                </button>
+
+                <Link 
+                  href="/"
+                  className="glass px-6 py-2 rounded-xl text-white hover:scale-105 transition-all duration-300 hover:shadow-xl"
+                >
+                  ← Back to Support
+                </Link>
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Main Dashboard Content */}
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {/* KPI Cards */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="glass-dark p-6 rounded-2xl card-hover">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
+                  <Users className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-3xl font-bold text-white">{stats?.totalTickets || 0}</span>
+              </div>
+              <h3 className="text-white font-semibold mb-1">Total Tickets</h3>
+              <p className="text-white/60 text-sm">All submitted tickets</p>
+            </div>
+
+            <div className="glass-dark p-6 rounded-2xl card-hover">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
+                  <CheckCircle className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-3xl font-bold text-white">{stats?.autoResolvedTickets || 0}</span>
+              </div>
+              <h3 className="text-white font-semibold mb-1">Auto Resolved</h3>
+              <p className="text-white/60 text-sm">AI automation success</p>
+            </div>
+
+            <div className="glass-dark p-6 rounded-2xl card-hover">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-orange-500 to-red-500 rounded-xl flex items-center justify-center">
+                  <AlertTriangle className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-3xl font-bold text-white">{stats?.escalatedTickets || 0}</span>
+              </div>
+              <h3 className="text-white font-semibold mb-1">Escalated</h3>
+              <p className="text-white/60 text-sm">Human intervention required</p>
+            </div>
+
+            <div className="glass-dark p-6 rounded-2xl card-hover">
+              <div className="flex items-center justify-between mb-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                  <TrendingUp className="w-6 h-6 text-white" />
+                </div>
+                <span className="text-3xl font-bold text-white">{stats?.successRate || 0}%</span>
+              </div>
+              <h3 className="text-white font-semibold mb-1">Success Rate</h3>
+              <p className="text-white/60 text-sm">AI automation efficiency</p>
+            </div>
+          </div>
+
+          {/* Charts Section */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+            {/* Category Distribution */}
+            <div className="glass-dark p-6 rounded-2xl">
+              <h3 className="text-xl font-bold text-white mb-6 flex items-center">
+                <Sparkles className="w-6 h-6 mr-2 text-yellow-300" />
+                Tickets by Category
+              </h3>
+              <div className="space-y-4">
+                {stats?.ticketsByCategory?.map((category) => (
+                  <div key={category.name} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                        {getCategoryIcon(category.name.toLowerCase())}
+                      </div>
+                      <span className="text-white font-medium">{category.name}</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-32 h-2 bg-white/20 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full transition-all duration-1000"
+                          style={{ width: `${(category.value / (stats?.totalTickets || 1)) * 100}%` }}
+                        ></div>
+                      </div>
+                      <span className="text-white font-bold">{category.value}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Priority Distribution */}
+            <div className="glass-dark p-6 rounded-2xl">
+              <h3 className="text-xl font-bold text-white mb-6 flex items-center">
+                <Zap className="w-6 h-6 mr-2 text-yellow-300" />
+                Tickets by Priority
+              </h3>
+              <div className="space-y-4">
+                {stats?.ticketsByPriority?.map((priority) => (
+                  <div key={priority.priority} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-3">
+                      <div 
+                        className="w-8 h-8 rounded-lg flex items-center justify-center"
+                        style={{ backgroundColor: getPriorityColor(priority.priority.toLowerCase()) }}
+                      >
+                        <span className="text-white font-bold text-sm">
+                          {priority.priority.charAt(0)}
+                        </span>
+                      </div>
+                      <span className="text-white font-medium">{priority.priority}</span>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <div className="w-32 h-2 bg-white/20 rounded-full overflow-hidden">
+                        <div 
+                          className="h-full rounded-full transition-all duration-1000"
+                          style={{ 
+                            backgroundColor: getPriorityColor(priority.priority.toLowerCase()),
+                            width: `${(priority.count / (stats?.totalTickets || 1)) * 100}%`
+                          }}
+                        ></div>
+                      </div>
+                      <span className="text-white font-bold">{priority.count}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Recent Activity Table */}
-          <div className="bg-white rounded-lg shadow-sm border">
-            <div className="px-6 py-4 border-b border-gray-200">
-              <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <Activity className="w-4 h-4" />
-                  <span>Latest {tickets.length} tickets</span>
-                </div>
-              </div>
-            </div>
-
+          <div className="glass-dark p-6 rounded-2xl">
+            <h3 className="text-xl font-bold text-white mb-6 flex items-center">
+              <Activity className="w-6 h-6 mr-2 text-yellow-300" />
+              Recent Activity
+            </h3>
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b border-white/20">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">
                       Ticket ID
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Title
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">
+                      Issue
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Category
-                    </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">
                       Priority
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">
                       Status
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">
                       Resolution Time
                     </th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    <th className="px-6 py-3 text-left text-xs font-medium text-white/60 uppercase tracking-wider">
                       Created
                     </th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="divide-y divide-white/10">
                   {tickets?.slice(0, 10).map((ticket, index) => (
-                    <tr key={ticket.id || `ticket-${index}`} className="hover:bg-gray-50">
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                    <tr key={ticket.id || `ticket-${index}`} className="hover:bg-white/5 transition-colors duration-200">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                         {ticket.id ? (ticket.id.substring(0, 8) + '...') : 'No ID'}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <div className="text-sm text-gray-900">
+                        <div className="text-sm text-white">
                           {ticket.title ? (ticket.title.substring(0, 50) + (ticket.title.length > 50 ? '...' : '')) : (ticket.issue ? (ticket.issue.substring(0, 50) + (ticket.issue.length > 50 ? '...' : '')) : 'No title')}
                         </div>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 py-1 text-xs font-medium rounded-full" 
+                        <span className="px-3 py-1 text-xs font-medium rounded-full" 
                               style={{ backgroundColor: getPriorityColor(ticket.priority || 'medium'), color: 'white' }}>
                           {(ticket.priority || 'medium').toUpperCase()}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 py-1 text-xs font-medium rounded-full" 
+                        <span className="px-3 py-1 text-xs font-medium rounded-full" 
                               style={{ backgroundColor: getStatusColor(ticket.status || 'open'), color: 'white' }}>
                           {(ticket.status || 'open').replace('_', ' ').toUpperCase()}
                         </span>
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white">
                         {ticket.resolution_time ? formatTime(ticket.resolution_time) : '-'}
                       </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-white/60">
                         {formatDate(ticket.created_at || ticket.submittedAt)}
                       </td>
                     </tr>
@@ -433,51 +495,55 @@ export default function AdminDashboard() {
               </table>
             </div>
           </div>
-        </div>
 
-        {/* Priority Distribution */}
-        <div className="bg-white rounded-lg shadow-sm border p-6 mb-8">
-          <h3 className="text-lg font-semibold text-gray-900 mb-4">Tickets by Priority</h3>
-          <div className="space-y-3">
-            {stats?.ticketsByPriority?.map((priority: any, index: number) => (
-              <div key={index} className="flex items-center justify-between">
-                <span className="text-sm font-medium text-gray-600">{priority.priority}</span>
-                <div className="flex items-center space-x-2">
-                  <div className="w-32 bg-gray-200 rounded-full h-4 relative">
-                    <div 
-                      className="bg-orange-500 h-4 rounded-full transition-all duration-500"
-                      style={{ width: `${(priority.count / Math.max(...stats.ticketsByPriority.map((p: any) => p.count))) * 100}%` }}
-                    ></div>
-                  </div>
-                  <span className="text-sm font-bold text-gray-900">{priority.count}</span>
-                </div>
-              </div>
-            ))}
+          {/* Quick Actions */}
+          <div className="mt-8 flex justify-center space-x-6">
+            <button 
+              onClick={handleRefresh}
+              className="btn-gradient px-8 py-4 rounded-2xl font-semibold shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-2"
+            >
+              <RefreshCw className="w-5 h-5" />
+              <span>Refresh Data</span>
+            </button>
+            <button 
+              onClick={handleClearData}
+              className="glass px-8 py-4 rounded-2xl font-semibold text-red-300 border border-red-500/30 hover:bg-red-500/20 transition-all duration-300 flex items-center space-x-2"
+            >
+              <Trash2 className="w-5 h-5" />
+              <span>Clear All Data</span>
+            </button>
+            <button className="btn-gradient px-8 py-4 rounded-2xl font-semibold shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-2">
+              <TrendingUp className="w-5 h-5" />
+              <span>View Analytics</span>
+            </button>
           </div>
         </div>
-
-        {/* Quick Actions */}
-        <div className="mt-8 flex justify-center space-x-4">
-          <button 
-            onClick={handleRefresh}
-            className="px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-          >
-            <RefreshCw className="w-4 h-4" />
-            <span>Refresh Data</span>
-          </button>
-          <button 
-            onClick={handleClearData}
-            className="px-6 py-3 bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors flex items-center space-x-2"
-          >
-            <Trash2 className="w-4 h-4" />
-            <span>Clear All Data</span>
-          </button>
-          <button className="px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors flex items-center space-x-2">
-            <TrendingUp className="w-4 h-4" />
-            <span>View Analytics</span>
-          </button>
-        </div>
       </div>
+
+      <style jsx>{`
+        @keyframes blob {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        .floating {
+          animation: float 6s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   )
 }

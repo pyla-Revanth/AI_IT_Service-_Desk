@@ -2,9 +2,9 @@
 
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
-import { Bot, MessageSquare, ArrowRight, CheckCircle, Clock, TrendingUp, Users } from 'lucide-react'
+import { Bot, MessageSquare, ArrowRight, CheckCircle, Clock, TrendingUp, Users, Sparkles, Zap, Shield, Cpu, Wifi, HardDrive, AlertTriangle } from 'lucide-react'
 
-export default function SimpleHomePage() {
+export default function AdvancedHomePage() {
   const [activeView, setActiveView] = useState<'form' | 'chat'>('form')
   const [formData, setFormData] = useState({
     issue: '',
@@ -16,11 +16,12 @@ export default function SimpleHomePage() {
     {
       id: 1,
       sender: 'ai',
-      message: 'Hello! I\'m here to help you with your IT issues. Please describe the problem you\'re experiencing, and I\'ll do my best to assist you.'
+      message: '🤖 Hello! I\'m your advanced AI assistant. I\'m here to help you with your IT issues using cutting-edge automation and intelligence!'
     }
   ])
   const [submittedTickets, setSubmittedTickets] = useState([])
   const [isClient, setIsClient] = useState(false)
+  const [theme, setTheme] = useState<'light' | 'dark'>('light')
 
   // Set isClient to true after component mounts
   useEffect(() => {
@@ -54,6 +55,14 @@ export default function SimpleHomePage() {
     }
   }, [submittedTickets, isClient])
 
+  const toggleTheme = () => {
+    const newTheme = theme === 'light' ? 'dark' : 'light'
+    setTheme(newTheme)
+    if (typeof window !== 'undefined') {
+      document.documentElement.setAttribute('data-theme', newTheme)
+    }
+  }
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     
@@ -78,7 +87,7 @@ export default function SimpleHomePage() {
         priority: formData.priority,
         confidence: 0.85,
         automation_possible: formData.category === 'hardware' || formData.category === 'network',
-        reasoning: `Based on your description: "${formData.issue}", this appears to be a ${formData.category} issue with ${formData.priority} priority.`
+        reasoning: `🧠 AI Analysis: Based on your description, this appears to be a ${formData.category} issue with ${formData.priority} priority. Confidence: 85%`
       }
 
       const ticketId = `ticket-${Date.now()}`
@@ -107,7 +116,7 @@ export default function SimpleHomePage() {
                   ...ticket, 
                   status: success ? 'resolved' : 'escalated',
                   aiResponse: success 
-                    ? `✅ Issue resolved automatically! ${formData.category === 'hardware' ? 'Disk cleanup completed successfully.' : 'VPN service restarted successfully.'}`
+                    ? `✅ Issue resolved automatically! ${formData.category === 'hardware' ? '🧹 Disk cleanup completed successfully. Performance improved by 35%.' : '🌐 VPN service restarted successfully. Connection restored.'}`
                     : '⚠️ Automation failed. Ticket has been escalated to human support.',
                   resolution_time: Math.floor(Math.random() * 10) + 5 // 5-15 seconds
                 }
@@ -165,260 +174,475 @@ export default function SimpleHomePage() {
       const aiResponse = {
         id: Date.now() + 1,
         sender: 'ai',
-        message: `I understand you're having an issue with: "${currentMessage}". Let me help you resolve this. Based on your description, I recommend checking the following steps...`
+        message: `🤖 I understand you're having an issue with: "${currentMessage}". Let me analyze this using my advanced AI capabilities and provide you with the best solution...`
       }
       setChatMessages(prev => [...prev, aiResponse])
     }, 1000)
   }
 
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'hardware': return <HardDrive className="w-5 h-5" />
+      case 'network': return <Wifi className="w-5 h-5" />
+      case 'software': return <Cpu className="w-5 h-5" />
+      case 'account': return <Shield className="w-5 h-5" />
+      default: return <Zap className="w-5 h-5" />
+    }
+  }
+
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-600 rounded-lg flex items-center justify-center">
-                <Bot className="w-5 h-5 text-white" />
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Animated Background */}
+      <div className="fixed inset-0 bg-gradient-to-br from-blue-600 via-purple-600 to-pink-600 opacity-90"></div>
+      <div className="fixed inset-0">
+        <div className="absolute top-0 left-0 w-72 h-72 bg-purple-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob"></div>
+        <div className="absolute top-0 right-0 w-72 h-72 bg-yellow-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-0 left-1/2 w-72 h-72 bg-pink-300 rounded-full mix-blend-multiply filter blur-xl opacity-70 animate-blob animation-delay-4000"></div>
+      </div>
+
+      {/* Theme Toggle */}
+      <button
+        onClick={toggleTheme}
+        className="fixed top-6 right-6 z-50 glass-dark p-3 rounded-full hover:scale-110 transition-all duration-300 glow"
+      >
+        {theme === 'light' ? '🌙' : '☀️'}
+      </button>
+
+      {/* Floating Particles */}
+      <div className="fixed inset-0 pointer-events-none">
+        {[...Array(20)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute w-2 h-2 bg-white rounded-full opacity-20 animate-float"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              animationDelay: `${Math.random() * 5}s`,
+              animationDuration: `${5 + Math.random() * 10}s`
+            }}
+          ></div>
+        ))}
+      </div>
+
+      {/* Main Content */}
+      <div className="relative z-10">
+        {/* Header */}
+        <header className="glass-dark border-b border-white/10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex justify-between items-center h-20">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center floating">
+                  <Bot className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h1 className="text-2xl font-bold text-white">AI IT Service Desk</h1>
+                  <p className="text-white/80">Advanced Intelligent Support System</p>
+                </div>
               </div>
-              <div>
-                <h1 className="text-xl font-semibold text-gray-900">AI IT Service Desk</h1>
-                <p className="text-sm text-gray-600">Intelligent IT Support Assistant</p>
-              </div>
+              
+              <nav className="flex items-center space-x-4">
+                <Link 
+                  href="/admin"
+                  className="glass px-6 py-3 rounded-xl text-white hover:scale-105 transition-all duration-300 hover:shadow-xl"
+                >
+                  📊 Admin Dashboard
+                </Link>
+                <Link 
+                  href="/chat-assistant"
+                  className="btn-gradient px-6 py-3 rounded-xl flex items-center space-x-2"
+                >
+                  <MessageSquare className="w-5 h-5" />
+                  <span>AI Chat</span>
+                </Link>
+              </nav>
+            </div>
+          </div>
+        </header>
+
+        {/* Hero Section */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <div className="text-center">
+            <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-lg rounded-full px-4 py-2 mb-6">
+              <Sparkles className="w-5 h-5 text-yellow-300" />
+              <span className="text-white font-medium">Powered by Advanced AI</span>
             </div>
             
-            <nav className="flex items-center space-x-4">
-              <Link 
-                href="/admin"
-                className="px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Admin Dashboard
-              </Link>
-              <Link 
-                href="/chat-assistant"
-                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center space-x-2"
-              >
-                <MessageSquare className="w-4 h-4" />
-                <span>Chat Assistant</span>
-              </Link>
-            </nav>
-          </div>
-        </div>
-      </header>
-
-      {/* Hero Section */}
-      <section className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <div className="text-center">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Get Instant IT Support with AI
+            <h2 className="text-5xl md:text-6xl font-bold text-white mb-6">
+              Next-Generation
+              <span className="gradient-text"> IT Support</span>
             </h2>
-            <p className="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-              Our AI-powered assistant helps you resolve IT issues quickly and efficiently. 
-              From password resets to software installations, we've got you covered.
+            <p className="text-xl text-white/80 mb-8 max-w-3xl mx-auto">
+              Experience the future of IT support with our advanced AI-powered assistant. 
+              Instant resolutions, intelligent automation, and 24/7 availability.
             </p>
             
             <div className="flex justify-center space-x-4">
               <button
                 onClick={() => setActiveView('form')}
-                className={`px-6 py-3 rounded-lg transition-colors ${
+                className={`px-8 py-4 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 ${
                   activeView === 'form' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'btn-gradient shadow-2xl' 
+                    : 'glass text-white hover:shadow-xl'
                 }`}
               >
-                Quick Help Form
+                🚀 Quick Help Form
               </button>
               <button
                 onClick={() => setActiveView('chat')}
-                className={`px-6 py-3 rounded-lg transition-colors ${
+                className={`px-8 py-4 rounded-2xl font-semibold transition-all duration-300 transform hover:scale-105 ${
                   activeView === 'chat' 
-                    ? 'bg-blue-600 text-white' 
-                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    ? 'btn-gradient shadow-2xl' 
+                    : 'glass text-white hover:shadow-xl'
                 }`}
               >
-                Chat with AI
+                💬 Chat with AI
               </button>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Submitted Tickets Section */}
-      {isClient && submittedTickets.length > 0 && (
-        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="bg-white rounded-lg shadow-sm border p-6">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">Your Submitted Tickets</h3>
-            <div className="space-y-4">
-              {submittedTickets.map((ticket) => (
-                <div key={ticket.id} className="border border-gray-200 rounded-lg p-4">
-                  <div className="flex justify-between items-start mb-2">
-                    <div>
-                      <span className="text-sm font-medium text-gray-900">Ticket #{ticket.id}</span>
-                    </div>
-                    <span className="text-sm text-gray-500">
-                      {ticket.submittedAt ? new Date(ticket.submittedAt).toLocaleTimeString() : 'N/A'}
-                    </span>
-                  </div>
-                  <p className="text-gray-900 mb-2">{ticket.issue}</p>
-                  <div className="bg-gray-50 rounded p-3">
-                    <p className="text-sm text-gray-900">{ticket.aiResponse}</p>
-                  </div>
-                </div>
-              ))}
             </div>
           </div>
         </section>
-      )}
 
-      {/* View Switcher */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeView === 'form' ? (
-          <div className="bg-white rounded-lg shadow-sm border p-8">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">Quick Help Form</h3>
-            <form onSubmit={handleFormSubmit} className="space-y-6">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  What issue are you experiencing?
-                </label>
-                <textarea
-                  value={formData.issue}
-                  onChange={(e) => setFormData({...formData, issue: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-900 text-gray-900"
-                  rows={4}
-                  placeholder="Please describe your IT issue in detail..."
-                />
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Category
-                  </label>
-                  <select 
-                    value={formData.category}
-                    onChange={(e) => setFormData({...formData, category: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
-                  >
-                    <option value="">Select category</option>
-                    <option value="password">Password Reset</option>
-                    <option value="vpn">VPN Issue</option>
-                    <option value="software">Software Install</option>
-                    <option value="hardware">Hardware Issue</option>
-                    <option value="account">Account Access</option>
-                  </select>
+        {/* Submitted Tickets Section */}
+        {isClient && submittedTickets.length > 0 && (
+          <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="relative">
+              {/* Border Wrapper */}
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 via-purple-500/20 to-pink-500/20 rounded-3xl blur-xl"></div>
+              <div className="relative glass-dark p-8 rounded-3xl border-2 border-white/20 shadow-2xl">
+                {/* Header */}
+                <div className="flex items-center justify-between mb-8">
+                  <h3 className="text-3xl font-bold text-white flex items-center">
+                    <div className="w-10 h-10 bg-gradient-to-r from-yellow-400 to-orange-500 rounded-xl flex items-center justify-center mr-3 floating">
+                      <Zap className="w-6 h-6 text-white" />
+                    </div>
+                    Your Active Tickets
+                  </h3>
+                  <div className="flex items-center space-x-2">
+                    <div className="w-3 h-3 bg-green-400 rounded-full animate-pulse"></div>
+                    <span className="text-white/80 text-sm">Live Updates</span>
+                  </div>
                 </div>
                 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Priority
-                  </label>
-                  <select 
-                    value={formData.priority}
-                    onChange={(e) => setFormData({...formData, priority: e.target.value})}
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 text-gray-900"
-                  >
-                    <option value="low">Low</option>
-                    <option value="medium">Medium</option>
-                    <option value="high">High</option>
-                    <option value="critical">Critical</option>
-                  </select>
+                {/* Tickets Container */}
+                <div className="space-y-4 max-h-96 overflow-y-auto custom-scrollbar">
+                  {submittedTickets.map((ticket) => (
+                    <div key={ticket.id} className="relative group">
+                      {/* Ticket Border */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-blue-500/30 to-purple-500/30 rounded-2xl blur group-hover:blur-none transition-all duration-300"></div>
+                      <div className="relative glass p-6 rounded-2xl border border-white/10 hover:border-white/30 transition-all duration-300 transform hover:-translate-y-1 hover:shadow-2xl">
+                        {/* Ticket Header */}
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="flex items-center space-x-4">
+                            <div className="w-12 h-12 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                              {getCategoryIcon(ticket.category)}
+                            </div>
+                            <div>
+                              <div className="flex items-center space-x-3">
+                                <span className="text-lg font-bold text-white">Ticket #{ticket.id}</span>
+                                <div className={`px-3 py-1 rounded-full text-xs font-semibold border ${
+                                  ticket.status === 'resolved' ? 'bg-green-500/20 text-green-300 border-green-500/30' :
+                                  ticket.status === 'escalated' ? 'bg-red-500/20 text-red-300 border-red-500/30' :
+                                  'bg-yellow-500/20 text-yellow-300 border-yellow-500/30'
+                                }`}>
+                                  {ticket.status.replace('_', ' ').toUpperCase()}
+                                </div>
+                              </div>
+                              <div className="flex items-center space-x-2 mt-2">
+                                <Clock className="w-4 h-4 text-white/60" />
+                                <span className="text-white/60 text-sm">
+                                  {ticket.submittedAt ? new Date(ticket.submittedAt).toLocaleTimeString() : 'N/A'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                        
+                        {/* Ticket Content */}
+                        <div className="space-y-4">
+                          <div className="bg-white/5 backdrop-blur-lg rounded-xl p-4 border border-white/10">
+                            <p className="text-white/90 font-medium">{ticket.issue}</p>
+                          </div>
+                          
+                          <div className="bg-gradient-to-r from-blue-500/10 to-purple-500/10 backdrop-blur-lg rounded-xl p-4 border border-white/20">
+                            <div className="flex items-start space-x-3">
+                              <Bot className="w-5 h-5 text-blue-400 mt-1 flex-shrink-0" />
+                              <div>
+                                <p className="text-white/90 text-sm leading-relaxed">{ticket.aiResponse}</p>
+                                {ticket.resolution_time && (
+                                  <div className="flex items-center space-x-2 mt-2">
+                                    <CheckCircle className="w-4 h-4 text-green-400" />
+                                    <span className="text-green-400 text-xs font-medium">
+                                      Resolved in {ticket.resolution_time}s
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-              
-              <button
-                type="submit"
-                className="w-full px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-              >
-                Submit Request
-              </button>
-            </form>
-          </div>
-        ) : (
-          <div className="bg-white rounded-lg shadow-sm border p-8">
-            <h3 className="text-xl font-semibold text-gray-900 mb-6">Chat with AI Assistant</h3>
-            <div className="space-y-4">
-              <div className="h-96 overflow-y-auto space-y-4 border border-gray-200 rounded-lg p-4">
-                {chatMessages.map((msg) => (
-                  <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-                    <div className={`max-w-xs lg:max-w-md px-4 py-2 rounded-lg ${
-                      msg.sender === 'user' 
-                        ? 'bg-blue-600 text-white' 
-                        : 'bg-gray-100 text-gray-900'
-                    }`}>
-                      <div className="flex items-center space-x-2 mb-1">
-                        {msg.sender === 'ai' && <Bot className="w-4 h-4 text-blue-600" />}
-                        <span className="text-xs font-medium">
-                          {msg.sender === 'user' ? 'You' : 'AI Assistant'}
-                        </span>
-                      </div>
-                      <p className="text-sm">{msg.message}</p>
+            </div>
+          </section>
+        )}
+
+        {/* View Switcher */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+          {activeView === 'form' ? (
+            <div className="relative">
+              {/* Form Border Wrapper */}
+              <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 via-blue-500/20 to-purple-500/20 rounded-3xl blur-xl"></div>
+              <div className="relative glass-dark p-8 rounded-3xl border-2 border-white/20 shadow-2xl">
+                <h3 className="text-3xl font-bold text-white mb-8 flex items-center">
+                  <div className="w-10 h-10 bg-gradient-to-r from-green-400 to-blue-500 rounded-xl flex items-center justify-center mr-3 floating">
+                    <Cpu className="w-6 h-6 text-white" />
+                  </div>
+                  Advanced Help Form
+                </h3>
+                <form onSubmit={handleFormSubmit} className="space-y-6">
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl"></div>
+                    <div className="relative">
+                      <label className="block text-white font-semibold mb-3 flex items-center">
+                        <Sparkles className="w-4 h-4 mr-2 text-yellow-300" />
+                        Describe your IT issue
+                      </label>
+                      <textarea
+                        value={formData.issue}
+                        onChange={(e) => setFormData({...formData, issue: e.target.value})}
+                        className="w-full px-4 py-4 bg-white/10 backdrop-blur-lg border-2 border-white/20 rounded-xl text-white placeholder-white/60 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300"
+                        rows={4}
+                        placeholder="Please describe your IT issue in detail..."
+                      />
                     </div>
                   </div>
-                ))}
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl"></div>
+                      <div className="relative">
+                        <label className="block text-white font-semibold mb-3 flex items-center">
+                          <Shield className="w-4 h-4 mr-2 text-purple-300" />
+                          Category
+                        </label>
+                        <select 
+                          value={formData.category}
+                          onChange={(e) => setFormData({...formData, category: e.target.value})}
+                          className="w-full px-4 py-4 bg-white/10 backdrop-blur-lg border-2 border-white/20 rounded-xl text-white focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300"
+                        >
+                          <option value="" className="bg-gray-800">Select category</option>
+                          <option value="password" className="bg-gray-800">🔐 Password Reset</option>
+                          <option value="vpn" className="bg-gray-800">🌐 VPN Issue</option>
+                          <option value="software" className="bg-gray-800">💻 Software Install</option>
+                          <option value="hardware" className="bg-gray-800">🔧 Hardware Issue</option>
+                          <option value="account" className="bg-gray-800">👤 Account Access</option>
+                        </select>
+                      </div>
+                    </div>
+                    
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-red-500/10 rounded-2xl"></div>
+                      <div className="relative">
+                        <label className="block text-white font-semibold mb-3 flex items-center">
+                          <AlertTriangle className="w-4 h-4 mr-2 text-orange-300" />
+                          Priority
+                        </label>
+                        <select 
+                          value={formData.priority}
+                          onChange={(e) => setFormData({...formData, priority: e.target.value})}
+                          className="w-full px-4 py-4 bg-white/10 backdrop-blur-lg border-2 border-white/20 rounded-xl text-white focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300"
+                        >
+                          <option value="low" className="bg-gray-800">🟢 Low</option>
+                          <option value="medium" className="bg-gray-800">🟡 Medium</option>
+                          <option value="high" className="bg-gray-800">🟠 High</option>
+                          <option value="critical" className="bg-gray-800">🔴 Critical</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-green-500/20 to-blue-500/20 rounded-2xl"></div>
+                    <button
+                      type="submit"
+                      className="relative w-full btn-gradient py-4 rounded-2xl font-bold text-lg shadow-2xl hover:shadow-3xl transform hover:scale-105 transition-all duration-300 flex items-center justify-center space-x-2"
+                    >
+                      <Zap className="w-6 h-6" />
+                      <span>Submit Request</span>
+                      <ArrowRight className="w-6 h-6" />
+                    </button>
+                  </div>
+                </form>
               </div>
-              
-              <form onSubmit={handleChatSubmit} className="flex space-x-2">
-                <input
-                  type="text"
-                  value={chatMessage}
-                  onChange={(e) => setChatMessage(e.target.value)}
-                  className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-900 text-gray-900"
-                  placeholder="Type your message..."
-                />
-                <button 
-                  type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium"
-                >
-                  Send
-                </button>
-              </form>
             </div>
-          </div>
-        )}
-      </section>
+          ) : (
+            <div className="relative">
+              {/* Chat Box Border Wrapper */}
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500/20 via-pink-500/20 to-blue-500/20 rounded-3xl blur-xl"></div>
+              <div className="relative glass-dark p-8 rounded-3xl border-2 border-white/20 shadow-2xl">
+                <h3 className="text-3xl font-bold text-white mb-8 flex items-center">
+                  <div className="w-10 h-10 bg-gradient-to-r from-purple-400 to-pink-500 rounded-xl flex items-center justify-center mr-3 floating">
+                    <MessageSquare className="w-6 h-6 text-white" />
+                  </div>
+                  AI Chat Assistant
+                </h3>
+                <div className="space-y-6">
+                  {/* Chat Messages Container */}
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-blue-500/10 to-purple-500/10 rounded-2xl"></div>
+                    <div className="relative h-96 overflow-y-auto space-y-4 glass rounded-2xl p-6 border border-white/10 custom-scrollbar">
+                      {chatMessages.map((msg) => (
+                        <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'} group`}>
+                          {/* Message Border */}
+                          <div className="relative">
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur group-hover:blur-none transition-all duration-300"></div>
+                            <div className={`relative px-6 py-4 rounded-2xl border transition-all duration-300 transform hover:scale-105 ${
+                              msg.sender === 'user' 
+                                ? 'btn-gradient shadow-xl border-white/20' 
+                                : 'glass shadow-xl border-white/10 hover:border-white/30'
+                            }`}>
+                              {/* Message Header */}
+                              <div className="flex items-center space-x-2 mb-3">
+                                {msg.sender === 'ai' && (
+                                  <div className="w-8 h-8 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                                    <Bot className="w-4 h-4 text-white" />
+                                  </div>
+                                )}
+                                <div className="flex items-center space-x-2">
+                                  <span className="text-sm font-bold text-white">
+                                    {msg.sender === 'user' ? '👤 You' : '🤖 AI Assistant'}
+                                  </span>
+                                  {msg.sender === 'ai' && (
+                                    <div className="flex items-center space-x-1">
+                                      <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
+                                      <span className="text-green-400 text-xs">Online</span>
+                                    </div>
+                                  )}
+                                </div>
+                              </div>
+                              
+                              {/* Message Content */}
+                              <p className="text-white leading-relaxed">{msg.message}</p>
+                              
+                              {/* Message Footer */}
+                              <div className="flex items-center justify-between mt-3">
+                                <span className="text-white/60 text-xs">
+                                  {new Date().toLocaleTimeString()}
+                                </span>
+                                {msg.sender === 'ai' && (
+                                  <div className="flex items-center space-x-1">
+                                    <CheckCircle className="w-3 h-3 text-green-400" />
+                                    <span className="text-green-400 text-xs">Delivered</span>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Chat Input Container */}
+                  <div className="relative">
+                    <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 to-pink-500/10 rounded-2xl"></div>
+                    <div className="relative glass p-4 rounded-2xl border border-white/20">
+                      <form onSubmit={handleChatSubmit} className="flex space-x-4">
+                        <div className="relative flex-1">
+                          <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-xl"></div>
+                          <input
+                            type="text"
+                            value={chatMessage}
+                            onChange={(e) => setChatMessage(e.target.value)}
+                            className="relative w-full px-6 py-4 bg-white/10 backdrop-blur-lg border border-white/20 rounded-xl text-white placeholder-white/60 focus:border-blue-400 focus:ring-2 focus:ring-blue-400/20 transition-all duration-300"
+                            placeholder="Type your message..."
+                          />
+                        </div>
+                        <button 
+                          type="submit"
+                          className="btn-gradient px-8 py-4 rounded-xl font-bold shadow-xl hover:shadow-2xl transform hover:scale-105 transition-all duration-300 flex items-center space-x-2"
+                        >
+                          <span>Send</span>
+                          <ArrowRight className="w-5 h-5" />
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+        </section>
 
-      {/* Features Section */}
-      <section className="bg-white border-t">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-          <h3 className="text-2xl font-bold text-gray-900 text-center mb-8">Why Choose AI IT Service Desk?</h3>
+        {/* Features Section */}
+        <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+          <h3 className="text-4xl font-bold text-white text-center mb-12">
+            Why Choose Our Advanced AI System?
+          </h3>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <Clock className="w-6 h-6 text-blue-600" />
+            <div className="glass-dark p-8 rounded-2xl card-hover text-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center mx-auto mb-6 floating">
+                <Clock className="w-8 h-8 text-white" />
               </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">24/7 Availability</h4>
-              <p className="text-gray-900">Get help anytime, anywhere. Our AI assistant is always ready to assist you.</p>
+              <h4 className="text-2xl font-bold text-white mb-4">24/7 Availability</h4>
+              <p className="text-white/80">Get help anytime, anywhere. Our AI assistant is always ready to assist you with instant responses.</p>
             </div>
             
-            <div className="text-center">
-              <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <CheckCircle className="w-6 h-6 text-green-600" />
+            <div className="glass-dark p-8 rounded-2xl card-hover text-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center mx-auto mb-6 floating" style={{animationDelay: '1s'}}>
+                <CheckCircle className="w-8 h-8 text-white" />
               </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Quick Resolution</h4>
-              <p className="text-gray-900">Most issues are resolved automatically without human intervention.</p>
+              <h4 className="text-2xl font-bold text-white mb-4">Instant Resolution</h4>
+              <p className="text-white/80">Most issues are resolved automatically within seconds using advanced AI automation.</p>
             </div>
             
-            <div className="text-center">
-              <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mx-auto mb-4">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
+            <div className="glass-dark p-8 rounded-2xl card-hover text-center">
+              <div className="w-16 h-16 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mx-auto mb-6 floating" style={{animationDelay: '2s'}}>
+                <TrendingUp className="w-8 h-8 text-white" />
               </div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-2">Smart Learning</h4>
-              <p className="text-gray-900">Our system learns from each interaction to provide better support over time.</p>
+              <h4 className="text-2xl font-bold text-white mb-4">Smart Learning</h4>
+              <p className="text-white/80">Our system learns from each interaction to provide better and more accurate support over time.</p>
             </div>
           </div>
-        </div>
-      </section>
+        </section>
 
-      {/* Footer */}
-      <footer className="bg-gray-50 border-t">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="text-center text-gray-900">
-            <p>&copy; 2024 AI IT Service Desk. All rights reserved.</p>
+        {/* Footer */}
+        <footer className="glass-dark border-t border-white/10">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+            <div className="text-center text-white/80">
+              <p>&copy; 2024 AI IT Service Desk. Advanced Intelligent Support System.</p>
+            </div>
           </div>
-        </div>
-      </footer>
+        </footer>
+      </div>
+
+      <style jsx>{`
+        @keyframes blob {
+          0% { transform: translate(0px, 0px) scale(1); }
+          33% { transform: translate(30px, -50px) scale(1.1); }
+          66% { transform: translate(-20px, 20px) scale(0.9); }
+          100% { transform: translate(0px, 0px) scale(1); }
+        }
+        .animate-blob {
+          animation: blob 7s infinite;
+        }
+        .animation-delay-2000 {
+          animation-delay: 2s;
+        }
+        .animation-delay-4000 {
+          animation-delay: 4s;
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0px); }
+          50% { transform: translateY(-20px); }
+        }
+        .animate-float {
+          animation: float 6s ease-in-out infinite;
+        }
+      `}</style>
     </div>
   )
 }
