@@ -5,8 +5,7 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 // Import routes
-const ticketRoutes = require('./routes/tickets');
-const chatRoutes = require('./routes/chat');
+const simpleRoutes = require('./routes/simple');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -66,8 +65,7 @@ app.get('/api/health', (req, res) => {
 });
 
 // API routes
-app.use('/api/tickets', ticketRoutes);
-app.use('/api/chat', chatRoutes);
+app.use('/api', simpleRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -112,6 +110,20 @@ const server = app.listen(PORT, () => {
   console.log(`🚀 AI IT Service Desk API Server running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`\n📋 Available Endpoints:`);
+  console.log(`   GET    /api/health - Health check`);
+  console.log(`   GET    /api/tickets - Get all tickets`);
+  console.log(`   POST   /api/tickets - Create new ticket`);
+  console.log(`   GET    /api/tickets/:id - Get specific ticket`);
+  console.log(`   PUT    /api/tickets/:id - Update ticket`);
+  console.log(`   DELETE /api/tickets/:id - Delete ticket`);
+  console.log(`   GET    /api/tickets/stats - Get ticket statistics`);
+  console.log(`   GET    /api/resolutions - Get all resolutions`);
+  console.log(`   POST   /api/resolutions - Create new resolution`);
+  console.log(`   GET    /api/resolutions/:id - Get specific resolution`);
+  console.log(`   PUT    /api/resolutions/:id - Update resolution`);
+  console.log(`   GET    /api/resolutions/stats - Get resolution statistics`);
+  console.log(`   GET    /api/tickets-with-resolutions - Get tickets with resolutions`);
 });
 
 module.exports = app;

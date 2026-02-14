@@ -5,8 +5,7 @@ const rateLimit = require('express-rate-limit');
 require('dotenv').config();
 
 // Import routes
-const ticketRoutes = require('./routes/tickets');
-const chatRoutes = require('./routes/chat');
+const ticketRoutes = require('./ticket-api');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -56,24 +55,36 @@ app.use((req, res, next) => {
 });
 
 // Health check endpoint
-app.get('/api/health', (req, res) => {
-  res.json({ 
-    status: 'healthy', 
-    timestamp: new Date().toISOString(),
-    version: '1.0.0',
-    environment: process.env.NODE_ENV || 'development'
-  });
+app.get('/api/health', async (req, res) => {
+  try {
+    const db = require('./supabase-db');
+    const dbStatus = await db.testConnection();
+    
+    res.json({ 
+      status: 'healthy', 
+      timestamp: new Date().toISOString(),
+      version: '1.0.0',
+      environment: process.env.NODE_ENV || 'development',
+      database: dbStatus
+    });
+  } catch (error) {
+    res.status(500).json({
+      status: 'unhealthy',
+      timestamp: new Date().toISOString(),
+      error: error.message
+    });
+  }
 });
 
 // API routes
-app.use('/api/tickets', ticketRoutes);
-app.use('/api/chat', chatRoutes);
+app.use('/api', ticketRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
   res.status(404).json({
     success: false,
-    error: 'Endpoint not found'
+    error: 'Endpoint not found',
+    message: `Cannot ${req.method} ${req.originalUrl}`
   });
 });
 
@@ -89,7 +100,10 @@ app.use((error, req, res, next) => {
   res.status(500).json({
     success: false,
     error: message,
-    ...(process.env.NODE_ENV !== 'production' && { stack: error.stack })
+    ...(process.env.NODE_ENV !== 'production' && { 
+      stack: error.stack,
+      details: error.message 
+    })
   });
 });
 
@@ -112,6 +126,16 @@ const server = app.listen(PORT, () => {
   console.log(`🚀 AI IT Service Desk API Server running on port ${PORT}`);
   console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`\n📋 Available Endpoints:`);
+  console.log(`   POST   /api/tickets - Create ticket`);
+  console.log(`   GET    /api/tickets - List tickets`);
+  console.log(`   POST   /api/tickets/classify - AI classify ticket`);
+  console.log(`   POST   /api/tickets/resolve - Resolve ticket`);
+  console.log(`   GET    /api/tickets/:id - Get specific ticket`);
+  console.log(`   PUT    /api/tickets/:id - Update ticket`);
+  console.log(`   DELETE /api/tickets/:id - Delete ticket`);
+  console.log(`   GET    /api/tickets/stats - Get statistics`);
+  console.log(`   GET    /api/health - Health check`);
 });
 
 module.exports = app;

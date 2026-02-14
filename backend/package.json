@@ -4,9 +4,10 @@
   "description": "Backend for AI IT Service Desk",
   "main": "server.js",
   "scripts": {
-    "dev": "nodemon server.js",
-    "start": "node server.js",
-    "build": "echo 'No build step required for Node.js'"
+    "dev": "nodemon app.js",
+    "start": "node app.js",
+    "build": "echo 'No build step required for Node.js'",
+    "test": "node test-api.js"
   },
   "dependencies": {
     "express": "^4.18.2",

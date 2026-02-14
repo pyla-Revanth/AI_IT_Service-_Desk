@@ -11,16 +11,24 @@ export interface Ticket {
   created_at: string;
   updated_at: string;
   resolved_at?: string;
+  impact_level?: 'individual' | 'team' | 'department' | 'organization';
+  urgency_score?: number;
+  tags?: string[];
   ai_classification?: {
     confidence: number;
     suggested_category: string;
     suggested_priority: string;
+    urgency_score?: number;
+    impact_level?: string;
+    classification_reasoning?: string;
   };
   resolution?: {
     method: 'automated' | 'manual';
     script_used?: string;
     steps_taken: string[];
     resolution_time: number;
+    resolved_by?: string;
+    notes?: string;
   };
 }
 
